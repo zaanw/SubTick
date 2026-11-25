@@ -54,7 +54,14 @@ void SubtickEngine::resetForLayer(PlayLayer* layer) {
 }
 
 bool SubtickEngine::beginFrame(PlayLayer* layer, double modifiedDelta) {
-    if (!layer || !std::isfinite(modifiedDelta)) {
+    if (!layer) {
+        return false;
+    }
+
+    if (!std::isfinite(modifiedDelta) || modifiedDelta <= 0.0) {
+        ++m_metrics.fallbackFrames;
+        ++m_metrics.invalidTimingFallbacks;
+        flushToVanilla(layer);
         return false;
     }
 

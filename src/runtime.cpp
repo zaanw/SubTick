@@ -7,7 +7,7 @@ using namespace geode::prelude;
 namespace subtick {
 namespace {
 bool hasInputConflict() {
-    auto loader = Loader::get();
+    auto const loader = Loader::get();
     return loader->getLoadedMod("syzzi.click_between_frames") != nullptr ||
            loader->getLoadedMod("zmx.cbf-lite") != nullptr ||
            loader->getLoadedMod("wayago.click-between-ticks") != nullptr;
@@ -20,10 +20,10 @@ Runtime& Runtime::get() {
 }
 
 void Runtime::reloadSettings() {
-    auto mod = Mod::get();
+    auto const mod = Mod::get();
     m_enabled.store(mod->getSettingValue<bool>("enabled"), std::memory_order_relaxed);
 
-    auto selectedMode = mod->getSettingValue<std::string>("mode");
+    auto const selectedMode = mod->getSettingValue<std::string>("mode");
     m_mode.store(
         selectedMode == "Exact Subtick" ? InputMode::Exact : InputMode::Compatibility,
         std::memory_order_relaxed
