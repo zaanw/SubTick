@@ -1,6 +1,7 @@
 #include "engine/tick_clock.hpp"
 #include "engine/timeline.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -33,13 +34,22 @@ std::vector<double> scheduleAtFps(int fps) {
     }
 
     std::vector<double> observed(kInputTimes.size(), -1.0);
-    constexpr double tickDuration = 1.0 / 240.0;
-    double tickStart = 1.0;
+    constexpr double durationSeconds = 1.0;
+    constexpr double startTime = 1.0;
+    auto const frameDuration = durationSeconds / static_cast<double>(fps);
+    double tickStart = startTime;
 
     for (int frame = 1; frame <= fps; ++frame) {
-        auto const horizon = 1.0 + static_cast<double>(frame) / static_cast<double>(fps);
+        auto const frameStart =
+            startTime + static_cast<double>(frame - 1) * frameDuration;
+        auto const horizon = startTime + static_cast<double>(frame) * frameDuration;
+        auto const physicsSteps = static_cast<std::uint32_t>(
+            std::round(std::max(1.0, frameDuration * 240.0))
+        );
+        auto const tickDuration = frameDuration / static_cast<double>(physicsSteps);
+        tickStart = frameStart;
 
-        while (tickStart + tickDuration <= horizon + 1e-12) {
+        for (std::uint32_t step = 0; step < physicsSteps; ++step) {
             require(timeline.beginTick(tickStart, tickDuration, horizon),
                     "prepare actual physics tick");
 
@@ -65,7 +75,7 @@ int main() {
             "normalized physics step maps to 240 Hz");
 
     constexpr std::array fpsValues = {
-        15, 24, 30, 40, 50, 60, 75, 80, 90, 120, 144, 165, 240, 360, 500, 1000,
+        15, 24, 30, 40, 50, 60, 75, 80, 90, 120, 144, 165, 240, 360, 500, 1000, 1500, 3000,
     };
 
     auto const reference = scheduleAtFps(240);
@@ -80,6 +90,6 @@ int main() {
         }
     }
 
-    std::cout << "SubTick FPS invariance passed from 15 to 1000 FPS\n";
+    std::cout << "SubTick FPS invariance passed from 15 to 3000 FPS\n";
     return 0;
 }

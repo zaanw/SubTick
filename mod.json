@@ -1,0 +1,50 @@
+{
+    "geode": "5.8.2",
+    "gd": {
+        "win": "2.2081"
+    },
+    "id": "zaanw.subtick",
+    "name": "SubTick",
+    "version": "v0.1.0",
+    "developer": "zaanw",
+    "description": "Experimental timestamp-based input scheduling inside Geometry Dash physics ticks.",
+    "tags": [
+        "gameplay",
+        "enhancement",
+        "developer"
+    ],
+    "incompatibilities": {
+        "syzzi.click_between_frames": ">=v1.0.0",
+        "zmx.cbf-lite": ">=v1.0.0",
+        "wayago.click-between-ticks": ">=v1.0.0"
+    },
+    "settings": {
+        "enabled": {
+            "name": "Enable SubTick",
+            "description": "Use the timestamp timeline while playing supported levels.",
+            "type": "bool",
+            "default": true
+        },
+        "mode": {
+            "name": "Input mode",
+            "description": "Compatibility avoids splitting buffer-sensitive airborne states. Exact splits every input-bearing player tick.",
+            "type": "string",
+            "one-of": [
+                "Compatibility Subtick",
+                "Exact Subtick"
+            ],
+            "default": "Compatibility Subtick",
+            "enable-if": "enabled"
+        },
+        "timing-note": {
+            "name": "Timing model",
+            "description": "SubTick uses Geode input timestamps and the game's actual PlayerObject physics updates. Render frames do not directly choose the input position.",
+            "type": "info"
+        },
+        "physics-note": {
+            "name": "Physics note",
+            "description": "Splitting a physics tick changes the order of integration and collision work. Exact mode is experimental and may behave differently from vanilla physics.",
+            "type": "info"
+        }
+    }
+}
